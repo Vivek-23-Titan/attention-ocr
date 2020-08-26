@@ -108,7 +108,7 @@ def _extract_argmax_and_embed(embedding, output_projection=None,
 def attention_decoder(decoder_inputs, initial_state, attention_states, cell,
                       output_size=None, num_heads=1, loop_function=None,
                       dtype=tf.float32, scope=None,
-                      initial_state_attention=False, attn_num_hidden=128):
+                      initial_state_attention=False, attn_num_hidden=256):
     """RNN decoder with attention for the sequence-to-sequence model.
 
     In this context "attention" means that, during decoding, the RNN can look up
@@ -283,7 +283,7 @@ def embedding_attention_decoder(decoder_inputs, initial_state, attention_states,
                                 update_embedding_for_previous=True,
                                 dtype=tf.float32, scope=None,
                                 initial_state_attention=False,
-                                attn_num_hidden=128):
+                                attn_num_hidden=256):
     """RNN decoder with embedding and attention and a pure-decoding option.
 
     Args:
