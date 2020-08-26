@@ -142,14 +142,30 @@ class CNN(object):
         net = ConvReluBN(net, 256, (3, 3), 'conv_conv3', is_training)
         net = ConvRelu(net, 256, (3, 3), 'conv_conv4')
         net = max_2x1pool(net, 'conv_pool3')
+        
+        #__________________Inserting new layer________________________
 
-        net = ConvReluBN(net, 512, (3, 3), 'conv_conv5', is_training)
-        net = ConvRelu(net, 512, (3, 3), 'conv_conv6')
+        net = ConvReluBN(net, 256, (3, 3), 'conv_conv5', is_training)
+        net = ConvRelu(net, 256, (3, 3), 'conv_conv6')
         net = max_2x1pool(net, 'conv_pool4')
+        #_____________________________________________________________
 
-        net = ConvReluBN(net, 512, (2, 2), 'conv_conv7', is_training)
+        net = ConvReluBN(net, 512, (3, 3), 'conv_conv7', is_training)
+        net = ConvRelu(net, 512, (3, 3), 'conv_conv8')
         net = max_2x1pool(net, 'conv_pool5')
+
+
+        net = ConvReluBN(net, 512, (3, 3), 'conv_conv9', is_training)
+        net = ConvRelu(net, 512, (3, 3), 'conv_conv10')
+        net = max_2x1pool(net, 'conv_pool6')
+
+        #__________________Inserting new layer________________________
+
+        net = ConvReluBN(net, 512, (2, 2), 'conv_conv11', is_training)
+        net = max_2x1pool(net, 'conv_pool7')
         net = dropout(net, is_training)
+        #_____________________________________________________________
+
 
         net = tf.squeeze(net, axis=1)
 
