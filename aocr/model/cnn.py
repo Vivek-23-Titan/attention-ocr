@@ -161,8 +161,12 @@ class CNN(object):
 
         #__________________Inserting new layer________________________
 
-        net = ConvReluBN(net, 512, (2, 2), 'conv_conv11', is_training)
+        net = ConvReluBN(net, 1024, (3, 3), 'conv_conv10', is_training)
+        net = ConvRelu(net, 1024, (3, 3), 'conv_conv11')
         net = max_2x1pool(net, 'conv_pool7')
+        
+        net = ConvReluBN(net, 1024, (2, 2), 'conv_conv12', is_training)
+        net = max_2x1pool(net, 'conv_pool8')
         net = dropout(net, is_training)
         #_____________________________________________________________
 
