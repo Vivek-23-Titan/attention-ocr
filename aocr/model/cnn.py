@@ -111,8 +111,8 @@ def residual_block(incoming, num_filters, filter_size, name = 'residual'):
     #num_filters_from = incoming.get_shape().as_list()[3]
     input_channels = int(incoming.get_shape()[-1])
     
-    conv1 = ConvReluBN(incoming, num_filters, filter_size, name = '{}_conv1'.format(name))
-    conv2 = ConvReluBN(conv1, num_filters, filter_size, name = '{}_conv2'.format(name))
+    conv1 = ConvReluBN(incoming, num_filters, filter_size, name = '{}_conv1'.format(name), is training)
+    conv2 = ConvReluBN(conv1, num_filters, filter_size, name = '{}_conv2'.format(name), is training)
     
     if input_channels != num_filters:
         # Identity mapping with Zero-Padding
