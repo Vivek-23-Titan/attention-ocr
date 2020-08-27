@@ -100,7 +100,14 @@ def ConvReluBN(incoming, num_filters, filter_size, name, is_training):
 
         return tf.nn.relu(after_bn)
 
-
+#_______________________________________Change: Create residual Block__________________________
+def residual_block(incoming, num_filters, filer_size, name, is_training):
+    
+    """Create a Residual Block with 2 Conv layers"""
+    
+    
+    
+    
 def dropout(incoming, is_training, keep_prob=0.5):
     return tf.contrib.layers.dropout(incoming, keep_prob=keep_prob, is_training=is_training)
 
@@ -113,6 +120,7 @@ def tf_create_attention_map(incoming):
     '''
     shape = incoming.get_shape().as_list()
     return tf.reshape(incoming, (-1, np.prod(shape[1:3]), shape[3]))
+
 
 
 class CNN(object):
