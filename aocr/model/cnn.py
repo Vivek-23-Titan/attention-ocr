@@ -1,6 +1,7 @@
 # pylint: disable=invalid-name
 
 from __future__ import absolute_import
+#from tensorflow.keras.applications import Res # TensorFlow ONLY
 
 import numpy as np
 import tensorflow as tf
@@ -128,7 +129,8 @@ def residual_block(incoming, num_filters, filter_size, name = 'residual'):
     return out
 #_______________________________________________________________________________________________________         
     
-    
+
+
     
 def dropout(incoming, is_training, keep_prob=0.5):
     return tf.contrib.layers.dropout(incoming, keep_prob=keep_prob, is_training=is_training)
@@ -165,37 +167,22 @@ class CNN(object):
         net = tf.add(input_tensor, (-128.0))
         net = tf.multiply(net, (1/128.0))
         
-        
-        #__________________________________________________RESNET RESIDUAL BLOCKS_____________________________________________________ 
-        
-        """ All residual blocks use zero-padding
-        for shortcut connections """
-        
-        for i in range(self.NUM_CONV):
-            resBlock2 = residual_block(net, 64, (3, 3), 'resBlock2_{}'.format(i + 1))
-        
-        net = max_2x2pool(net, 'conv_pool1')
+        #________________________________________________Keras ResNet Transfer Learning_________________________________
+        base_model = tf.keras.applications.ResNet50V2(
+            weights='imagenet',  # Load weights pre-trained on ImageNet.
+            input_shape=incoming.get_shape(),
+            include_top=False)  # Do not include the ImageNet classifier at the top.
 
-        for i in range(self.NUM_CONV+1):
-            resBlock3 = residual_block(net, 128, (3, 3), name = 'resBlock3_{}'.format(i + 1))
+        base_model.trainable = False
         
-        net = max_2x2pool(net, 'conv_pool2')
-        
-        for i in range(self.NUM_CONV+3):
-            resBlock4 = residual_block(net, 256, (3, 3), name = 'resBlock4_{}'.format(i + 1))
-        
-        net = max_2x2pool(net, 'conv_pool3')
-        
-        
-        for i in range(self.NUM_CONV):
-            resBlock5 = residual_block(net, 512, (3, 3), name = 'resBlock5_{}'.format(i + 1))
-        
-        net = max_2x2pool(net, 'conv_pool4')
+        net = base_model(net, training=False)
         
         #_______________________________________________________________________________________________________
 
         
-
+        net = ConvReluBN(net, 512, (3, 3), 'conv_conv5', is_training)
+        net = ConvRelu(net, 512, (3, 3), 'conv_conv6')
+        net = max_2x1pool(net, 'conv_pool4')
         
         net = ConvReluBN(net, 1024, (2, 2), 'conv_conv7', is_training)
         net = max_2x1pool(net, 'conv_pool5')
