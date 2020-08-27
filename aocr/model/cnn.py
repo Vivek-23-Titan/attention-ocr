@@ -147,7 +147,7 @@ class CNN(object):
         net = ConvRelu(net, 512, (3, 3), 'conv_conv6')
         net = max_2x1pool(net, 'conv_pool4')
 
-        net = ConvReluBN(net, 512, (2, 2), 'conv_conv7', is_training)
+        net = ConvReluBN(net, 1024, (2, 2), 'conv_conv7', is_training)
         net = max_2x1pool(net, 'conv_pool5')
         net = dropout(net, is_training)
 
