@@ -172,37 +172,33 @@ class CNN(object):
         for shortcut connections """
         
         for i in range(self.NUM_CONV):
-            resBlock2 = residual_block(net, 32, (3, 3), 'resBlock2_{}'.format(i + 1))
+            resBlock2 = residual_block(net, 64, (3, 3), 'resBlock2_{}'.format(i + 1))
         
         net = max_2x2pool(net, 'conv_pool1')
 
-        for i in range(self.NUM_CONV):
-            resBlock3 = residual_block(net, 64, (3, 3), name = 'resBlock3_{}'.format(i + 1))
+        for i in range(self.NUM_CONV+1):
+            resBlock3 = residual_block(net, 128, (3, 3), name = 'resBlock3_{}'.format(i + 1))
         
         net = max_2x2pool(net, 'conv_pool2')
         
-        for i in range(self.NUM_CONV):
-            resBlock4 = residual_block(net, 128, (3, 3), name = 'resBlock4_{}'.format(i + 1))
+        for i in range(self.NUM_CONV+3):
+            resBlock4 = residual_block(net, 256, (3, 3), name = 'resBlock4_{}'.format(i + 1))
         
         net = max_2x2pool(net, 'conv_pool3')
         
         
         for i in range(self.NUM_CONV):
-            resBlock5 = residual_block(net, 256, (3, 3), name = 'resBlock5_{}'.format(i + 1))
+            resBlock5 = residual_block(net, 512, (3, 3), name = 'resBlock5_{}'.format(i + 1))
         
         net = max_2x2pool(net, 'conv_pool4')
         
         #_______________________________________________________________________________________________________
 
         
-        
-        net = ConvReluBN(net, 512, (3, 3), 'conv_conv5', is_training)
-        net = ConvRelu(net, 512, (3, 3), 'conv_conv6')
-        net = max_2x1pool(net, 'conv_pool6')
 
         
         net = ConvReluBN(net, 1024, (2, 2), 'conv_conv7', is_training)
-        net = max_2x1pool(net, 'conv_pool8')
+        net = max_2x1pool(net, 'conv_pool5')
         net = dropout(net, is_training)
 
 
