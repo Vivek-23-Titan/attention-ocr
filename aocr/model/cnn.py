@@ -101,9 +101,34 @@ def ConvReluBN(incoming, num_filters, filter_size, name, is_training):
         return tf.nn.relu(after_bn)
 
 #_______________________________________Change: Create residual Block__________________________
-def residual_block(incoming, num_filters, filer_size, name, is_training):
+def residual_block(incoming, num_filters, filter_size, name = 'residual'):
     
     """Create a Residual Block with 2 Conv layers"""
+    
+    # num_filters_from = input_channels
+    # outchannels = num_filters
+    
+    #num_filters_from = incoming.get_shape().as_list()[3]
+    input_channels = int(incoming.get_shape()[-1])
+    
+    conv1 = ConvReluBN(incoming, num_filters, filter_size, name = '{}_conv1'.format(name))
+    conv2 = ConvReluBN(conv1, num_filters, filter_size, name = '{}_conv2'.format(name))
+    
+    if input_channels != num_filters:
+        # Identity mapping with Zero-Padding
+        # This method doesn't introduce extar parameters.
+        shortcut = tf.pad(incoming, [[0, 0], [0, 0], [0, 0], [0, num_filters - input_channels]])
+    else:
+        # Identity mapping.
+        shortcut = x
+    
+    # Element wise addition.
+    out = conv2 + shortcut
+    
+    return out
+            
+        
+    
     
     
     
