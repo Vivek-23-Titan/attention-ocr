@@ -100,7 +100,7 @@ def ConvReluBN(incoming, num_filters, filter_size, name, is_training):
 
         return tf.nn.relu(after_bn)
 
-#_______________________________________Change: Create residual Block__________________________
+#_______________________________________Change: Create residual Block________________________________
 def residual_block(incoming, num_filters, filter_size, name = 'residual'):
     
     """Create a Residual Block with 2 Conv layers"""
@@ -126,10 +126,7 @@ def residual_block(incoming, num_filters, filter_size, name = 'residual'):
     out = conv2 + shortcut
     
     return out
-            
-        
-    
-    
+#_______________________________________________________________________________________________________         
     
     
     
@@ -157,6 +154,8 @@ class CNN(object):
 
     def __init__(self, input_tensor, is_training):
         self._build_network(input_tensor, is_training)
+        #_____________________________Change for ResNet______________________
+        self.NUM_CONV = 3
 
     def _build_network(self, input_tensor, is_training):
         """
@@ -165,43 +164,49 @@ class CNN(object):
         """
         net = tf.add(input_tensor, (-128.0))
         net = tf.multiply(net, (1/128.0))
-
-        net = ConvRelu(net, 64, (3, 3), 'conv_conv1')
+        
+        
+        #__________________________________________________RESNET RESIDUAL BLOCKS_____________________________________________________ 
+        
+        """ All residual blocks use zero-padding
+        for shortcut connections """
+        
+        for i in range(self.NUM_CONV):
+            resBlock2 = residual_block(net, 16, (3, 3), 'resBlock2_{}'.format(i + 1))
+        
         net = max_2x2pool(net, 'conv_pool1')
 
-        net = ConvRelu(net, 128, (3, 3), 'conv_conv2')
+        for i in range(self.NUM_CONV):
+            resBlock3 = residual_block(net, 32, (3, 3), name = 'resBlock3_{}'.format(i + 1))
+        
         net = max_2x2pool(net, 'conv_pool2')
+        
+        for i in range(self.NUM_CONV):
+            resBlock4 = residual_block(net, 64, (3, 3), name = 'resBlock4_{}'.format(i + 1))
+        
+        net = max_2x2pool(net, 'conv_pool3')
+        
+        #_______________________________________________________________________________________________________
 
+        
+        net = ConvReluBN(net, 128, (3, 3), 'conv_conv1', is_training)
+        net = ConvRelu(net, 128, (3, 3), 'conv_conv2')
+        net = max_2x1pool(net, 'conv_pool4')
+        
+        
         net = ConvReluBN(net, 256, (3, 3), 'conv_conv3', is_training)
         net = ConvRelu(net, 256, (3, 3), 'conv_conv4')
-        net = max_2x1pool(net, 'conv_pool3')
-        
-        #__________________Inserting new layer________________________
-
-        net = ConvReluBN(net, 256, (3, 3), 'conv_conv5', is_training)
-        net = ConvRelu(net, 256, (3, 3), 'conv_conv6')
-        net = max_2x1pool(net, 'conv_pool4')
-        #_____________________________________________________________
-
-        net = ConvReluBN(net, 512, (3, 3), 'conv_conv7', is_training)
-        net = ConvRelu(net, 512, (3, 3), 'conv_conv8')
         net = max_2x1pool(net, 'conv_pool5')
 
-
-        net = ConvReluBN(net, 512, (3, 3), 'conv_conv9', is_training)
-        net = ConvRelu(net, 512, (3, 3), 'conv_conv10')
+        
+        net = ConvReluBN(net, 512, (3, 3), 'conv_conv5', is_training)
+        net = ConvRelu(net, 512, (3, 3), 'conv_conv6')
         net = max_2x1pool(net, 'conv_pool6')
 
-        #__________________Inserting new layer________________________
-
-        net = ConvReluBN(net, 1024, (3, 3), 'conv_conv10', is_training)
-        net = ConvRelu(net, 1024, (3, 3), 'conv_conv11')
-        net = max_2x1pool(net, 'conv_pool7')
         
-        net = ConvReluBN(net, 1024, (2, 2), 'conv_conv12', is_training)
+        net = ConvReluBN(net, 512, (2, 2), 'conv_conv7', is_training)
         net = max_2x1pool(net, 'conv_pool8')
         net = dropout(net, is_training)
-        #_____________________________________________________________
 
 
         net = tf.squeeze(net, axis=1)
